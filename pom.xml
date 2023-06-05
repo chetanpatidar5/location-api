@@ -75,6 +75,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>location-api</finalName>
 	</build>
-
 </project>
