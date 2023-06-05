@@ -1,9 +1,14 @@
 package com.chetan.locationapi.controller;
 
 
+import com.chetan.locationapi.exception.ResourceNotFoundException;
 import com.chetan.locationapi.model.Location;
+import com.chetan.locationapi.service.LocationService;
 import com.chetan.locationapi.service.LocationServiceImpl;
-import lombok.NoArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,45 +17,49 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@NoArgsConstructor
+@Tag(name = "Location", description = "Location APIs")
+@RequestMapping("/location")
+@AllArgsConstructor
 public class LocationController {
-    @Autowired
-    private LocationServiceImpl locationService;
 
+    private final LocationService locationService;
 
-    @PostMapping("/location")
+    @Operation(summary = "Create location API", description = "Create location REST API is used to save locations in a database")
+    @ApiResponse(responseCode = "201", description = "HTTP Status 201 CREATED")
+    @PostMapping("")
     public ResponseEntity<Location> createLocation(@RequestBody Location location) {
 
         Location locations = locationService.createLocation(location);
         return new ResponseEntity<>(locations, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getAllLocation")
+    @Operation(summary = "Get All Locations REST API", description = "Get All Locations REST API is used to get a all the locations from the database")
+    @ApiResponse(responseCode = "200", description = "HTTP Status 200 SUCCESS")
+    @GetMapping("/all")
     public ResponseEntity<List<Location>> getAllLocations() {
-        List<Location> getAllLocations = locationService.getAllLocation();
-        return new ResponseEntity<>(getAllLocations, HttpStatus.OK);
+        List<Location> allLocations = locationService.findAllLocation();
+        if (allLocations.isEmpty()) {
+            throw new ResourceNotFoundException("No locations found.");
+        }
+        return new ResponseEntity<>(allLocations, HttpStatus.OK);
     }
 
+
+    @Operation(summary = "search Locations REST API", description = "search Locations REST API is used to get  locations of latitude and longitude and type of locations from the database")
+    @ApiResponse(responseCode = "200", description = "HTTP Status 200 SUCCESS")
     @GetMapping("/search")
-    public ResponseEntity<List<Location>> searchLocationsByType(@RequestParam(required = false) String type,
-                                                          @RequestParam(defaultValue = "10") int limit
-    ) {
-        List<Location> locations = locationService.searchLocationsByType(type, limit);
-        return new ResponseEntity<>(locations, HttpStatus.OK);
-    }
-
-    @GetMapping("/locations")
-    public ResponseEntity<List<Location>> searchLocationsAndLat(
+    public ResponseEntity<List<Location>> searchLocations(
             @RequestParam(required = false) String type,
-            @RequestParam double lat1,
-            @RequestParam double lat2,
-            @RequestParam double lng1,
-            @RequestParam double lng2,
-            @RequestParam(defaultValue = "10") int limit
-    ) {
-        List<Location> locations = locationService.searchLocationsByTypeAndLat(type, lat1, lat2, lng1, lng2, limit);
-        return new ResponseEntity<>(locations, HttpStatus.OK);
-
+            @RequestParam(required = false) Double lat1,
+            @RequestParam(required = false) Double lat2,
+            @RequestParam(required = false) Double lng1,
+            @RequestParam(required = false) Double lng2,
+            @RequestParam(required = false, defaultValue = "10") int limit) {
+        List<Location> locationsTypes = locationService.findLocationsByLatAndLng(type, lat1, lat2, lng1, lng2, limit);
+        if (locationsTypes.isEmpty()) {
+            throw new ResourceNotFoundException("No locations found.");
+        }
+        return new ResponseEntity<>(locationsTypes, HttpStatus.OK);
     }
 }
 

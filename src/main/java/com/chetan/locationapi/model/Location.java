@@ -3,7 +3,6 @@ package com.chetan.locationapi.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "location")

@@ -2,18 +2,13 @@ package com.chetan.locationapi.service;
 
 import com.chetan.locationapi.model.Location;
 import com.chetan.locationapi.repository.LocationRepository;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class LocationServiceImpl {
-
+public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
 
@@ -21,26 +16,25 @@ public class LocationServiceImpl {
         this.locationRepository = locationRepository;
     }
 
-
     public Location createLocation(Location location) {
         return locationRepository.save(location);
     }
 
-
-    public List<Location> getAllLocation() {
+    @Override
+    public List<Location> findAllLocation() {
         return locationRepository.findAll();
     }
 
-
-
-
-    public List<Location> searchLocationsByType(String type, int limit) {
-        Pageable pageable = PageRequest.of(0, limit, Sort.by("type").descending());
-        return locationRepository.findLocationsByType(type, pageable);
+    public List<Location> findAllLocationsByType(int limit) {
+        List<Location> listOfLocations = locationRepository.findAllLocationsByTypeWithPremiumFirst(limit);
+        return listOfLocations.stream().filter(l -> l.getType().equals("premium")).collect(Collectors.toList());
     }
 
-    public List<Location> searchLocationsByTypeAndLat(String type, double lat1, double lat2, double lng1, double lng2, int limit) {
-        Pageable pageable = PageRequest.of(0, limit);
-        return locationRepository.searchLocationsByTypeAndLatAndLng(type, lat1, lat2, lng1, lng2, pageable);
+    public List<Location> findLocationsByLatAndLng(String type, Double lat1, Double lat2, Double lng1, Double lng2, int limit) {
+        if (type != null && !type.isEmpty() && lat1 != null && lng1 != null && lat2 != null && lng2 != null) {
+            return locationRepository.findLocationsForLatAndLng(type, lat1, lat2, lng1, lng2, limit);
+        } else {
+            return this.findAllLocationsByType(limit);
+        }
     }
 }
