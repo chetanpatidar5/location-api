@@ -12,7 +12,9 @@ public interface LocationService {
 
     List<Location> findAllLocation();
 
-    List<Location> findAllLocationsByType( int limit);
+    List<Location> findAllLocationsByTypeWithPremiumOrStandard(String type, int limit);
+
+    List<Location> findAllLocationsByPremium( int limit);
 
     public List<Location> findLocationsByLatAndLng(String type, Double lat1, Double lat2, Double lng1, Double lng2, int limit);
 

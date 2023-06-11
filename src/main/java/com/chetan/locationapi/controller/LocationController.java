@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +17,9 @@ import java.util.List;
 
 @RestController
 @Tag(name = "Location", description = "Location APIs")
-@RequestMapping("/location")
+@RequestMapping("/v1/locations")
 @AllArgsConstructor
+@Slf4j
 public class LocationController {
 
     private final LocationService locationService;
@@ -55,6 +57,7 @@ public class LocationController {
             @RequestParam(required = false, defaultValue = "10") int limit) {
         List<Location> locationsTypes = locationService.findLocationsByLatAndLng(type, lat1, lat2, lng1, lng2, limit);
         if (locationsTypes.isEmpty()) {
+            log.debug("no data found in location table");
             throw new ResourceNotFoundException("No locations found.");
         }
         return new ResponseEntity<>(locationsTypes, HttpStatus.OK);
