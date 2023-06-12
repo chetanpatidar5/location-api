@@ -3,7 +3,10 @@ Steps to run the application using docker make sure your docker is running in yo
 Step 1) Download the clone from below git repo 
 https://github.com/chetanpatidar5/location-api
 
-step 2) Unzip the folder and go to root path of the application
+step 2) make sure to do mvn install to generate jar in local-go to root path of the application
+C:\Users\DELL\Downloads\location-api-master\location-api-master>mvn install
+
+step 3) Unzip the folder and go to root path of the application
  
 Ex. C:\Users\DELL\IdeaProjects\IdeaProjects\location-api\location-api
 Step 3) type this command to build the image 
